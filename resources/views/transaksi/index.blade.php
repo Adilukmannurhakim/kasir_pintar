@@ -213,6 +213,24 @@
                     <span>Grand Total</span>
                     <span id="grand-total-val" style="color: var(--primary);">Rp 0</span>
                 </div>
+                <!-- ... bagian subtotal dan diskon ... -->
+                    <div class="row-info" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Subtotal</span>
+                        <span id="subtotal-display">Rp 0</span>
+                    </div>
+                    <!-- TAMBAHKAN BARIS PAJAK BARU DI SINI -->
+                    <div class="row-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span>Pajak (PPN 11%)</span>
+                        <span id="pajak-display" style="font-weight: 500; color: #64748b;">Rp 0</span>
+                    </div>
+                    <!-- --------------------------------- -->
+
+                    <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 15px 0;">
+
+                    <div class="row-info" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <span style="font-weight: bold; font-size: 18px;">Grand Total</span>
+                        <span id="grand-total-display" style="font-weight: bold; font-size: 18px; color: #4f46e5;">Rp 0</span>
+                    </div>
 
                 <div class="summary-row" style="margin-top: 20px;">
                     <span>Uang Diterima (Rp)</span>
@@ -311,33 +329,56 @@
 
         let currentGrandTotal = 0;
 
-        function calculateTotal() {
-            let subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
-            let discountPercent = parseFloat(document.getElementById('input-discount').value) || 0;
-            let discountValue = (discountPercent / 100) * subtotal;
-            let grandTotal = subtotal - discountValue;
+let currentPajakValue = 0; // Tambahan variabel global untuk menyimpan nilai nominal pajak
 
-            currentGrandTotal = grandTotal;
+function calculateTotal() {
+    // 1. Hitung Subtotal dari seluruh item di keranjang
+    let subtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    
+    // 2. Hitung Diskon
+    let discountPercent = parseFloat(document.getElementById('input-discount').value) || 0;
+    let discountValue = (discountPercent / 100) * subtotal;
+    
+    // 3. Hitung Pajak (PPN 11%) setelah dikurangi diskon
+    let dpp = subtotal - discountValue; // Dasar Pengenaan Pajak
+    let taxValue = dpp * 0.11; // Nominal PPN 11%
+    
+    // 4. Hitung Grand Total (Subtotal - Diskon + Pajak)
+    let grandTotal = dpp + taxValue;
 
-            document.getElementById('subtotal-val').innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
-            document.getElementById('grand-total-val').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+    // Simpan ke variabel global agar bisa dibaca oleh fungsi lain & dikirim ke database
+    currentGrandTotal = grandTotal;
+    currentPajakValue = taxValue; 
 
-            calculateChange();
-        }
+    // 5. Tampilkan hasil perhitungan ke elemen HTML masing-masing
+    document.getElementById('subtotal-val').innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
+    
+    // Pastikan Anda sudah membuat elemen dengan id="tax-val" di HTML untuk menampilkan nominal pajak
+    if (document.getElementById('tax-val')) {
+        document.getElementById('tax-val').innerText = 'Rp ' + Math.round(taxValue).toLocaleString('id-ID');
+    }
+    
+    document.getElementById('grand-total-val').innerText = 'Rp ' + Math.round(grandTotal).toLocaleString('id-ID');
 
-        function calculateChange() {
-            let cash = parseFloat(document.getElementById('input-cash').value) || 0;
-            let change = cash - currentGrandTotal;
+    // Hubungkan ulang ke kalkulator uang kembalian
+    calculateChange();
+}
 
-            if (change < 0) {
-                document.getElementById('change-val').innerText = 'Uang Kurang';
-                document.getElementById('change-val').style.color = '#ef4444';
-            } else {
-                document.getElementById('change-val').innerText = 'Rp ' + change.toLocaleString('id-ID');
-                document.getElementById('change-val').style.color = 'var(--success)';
-            }
-        }
+function calculateChange() {
+    let cash = parseFloat(document.getElementById('input-cash').value) || 0;
+    let change = cash - currentGrandTotal;
 
+    // Bulatkan nilai kembalian agar tidak ada desimal pecahan di struk
+    let roundedChange = Math.round(change);
+
+    if (change < 0) {
+        document.getElementById('change-val').innerText = 'Uang Kurang';
+        document.getElementById('change-val').style.color = '#ef4444';
+    } else {
+        document.getElementById('change-val').innerText = 'Rp ' + roundedChange.toLocaleString('id-ID');
+        document.getElementById('change-val').style.color = 'var(--success)';
+    }
+}
         function submitTransaction() {
             if (cart.length === 0) {
                 alert('Silakan pilih produk terlebih dahulu!');
@@ -372,7 +413,7 @@
                     alert('Transaksi berhasil disimpan! Nota akan otomatis dicetak.');
                     
                     // MEMBUKA TAB BARU UNTUK AUTO-PRINT NOTA
-                    let notaUrl = "{{ url('/transaksi/nota') }}/" + data.id_transaksi;
+                    let notaUrl = "{{ url('/transaksi/cetak') }}/" + data.id_transaksi;
                     window.open(notaUrl, '_blank'); 
 
                     // Memuat ulang halaman kasir agar keranjang kembali bersih

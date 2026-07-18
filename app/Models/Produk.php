@@ -2,25 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini
 
 class Produk extends Model
 {
-    use HasFactory;
+    use SoftDeletes; // Tambahkan ini
 
-    // 🌟 Beritahu Laravel nama tabel kustom kita
     protected $table = 'produk';
-
-    // 🌟 Tentukan Primary Key tabel (default Laravel adalah 'id')
     protected $primaryKey = 'id_produk';
-
-    // 🌟 Kolom yang boleh diisi
-    protected $fillable = [
-        'nama_produk',
-        'harga',
-        'stok'
-    ];
+    
+    // Pastikan kolom deleted_at didaftarkan jika diperlukan
+    protected $dates = ['deleted_at'];
+    
+    protected $fillable = ['nama_produk', 'harga', 'stok'];
 
     // Jika di tabel database-mu tidak ada kolom created_at dan updated_at, set ini ke false:
     public $timestamps = false; 

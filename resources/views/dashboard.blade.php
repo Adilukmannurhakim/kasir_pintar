@@ -62,25 +62,62 @@
 <body>
 
     <!-- SIDEBAR -->
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-store"></i> MAJU JAYA
+<div class="sidebar" style="display: flex; flex-direction: column; height: 100vh; justify-content: space-between; box-sizing: border-box; padding-bottom: 20px;">
+    
+    <!-- Bagian Atas: Logo dan Menu Navigasi -->
+    <div class="sidebar-top">
+        <div class="logo" style="margin-bottom: 24px;">
+            <i class="fa-solid fa-store"></i> JAYA
         </div>
-        <a href="{{ route('dashboard') }}" class="nav-link active">
-            <i class="fa-solid fa-chart-pie"></i> Dashboard
-        </a>
-        <a href="{{ route('transaksi.index') }}" class="nav-link">
-            <i class="fa-solid fa-cash-register"></i> Kasir / Transaksi
-        </a>
-        <!-- TAMBAHKAN BARIS INI -->
-        <a href="{{ route('transaksi.riwayat') }}" class="nav-link">
-            <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
-        </a>
-        <a href="{{ route('produk.index') }}" class="nav-link">
-            <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
-        </a>
+        
+        <div class="nav-menu" style="display: flex; flex-direction: column; gap: 8px;">
+            <a href="{{ route('dashboard') }}" class="nav-link active">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{{ route('transaksi.index') }}" class="nav-link">
+                <i class="fa-solid fa-cash-register"></i> Kasir / Transaksi
+            </a>
+            <a href="{{ route('transaksi.riwayat') }}" class="nav-link">
+                <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
+            </a>
+            <a href="{{ route('produk.index') }}" class="nav-link">
+                <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
+            </a>
+        </div>
     </div>
+
+    <!-- Bagian Bawah: Tombol Logout (Tetap di dalam kelas .sidebar) -->
+    <div class="sidebar-footer" style="padding: 16px 0 0 0; border-top: 1px solid #e2e8f0; margin-top: auto;">
+        <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: block; width: 100%;">
+            @csrf
+            <button type="submit" class="btn-logout" style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                width: 100%;
+                padding: 12px 16px;
+                background: transparent;
+                border: none;
+                color: #ef4444;
+                font-size: 15px;
+                font-weight: 500;
+                border-radius: 8px;
+                cursor: pointer;
+                text-align: left;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+            " onmouseover="this.style.backgroundColor='#fef2f2'" onmouseout="this.style.backgroundColor='transparent'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </button>
+        </form>
+    </div>
+
+</div>
 
     <!-- MAIN CONTENT -->
     <div class="main-content">

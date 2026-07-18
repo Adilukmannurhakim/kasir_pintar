@@ -117,9 +117,12 @@
                 @foreach($transaksis as $t)
                     <tr>
                         <td class="nota-cell">#{{ str_pad($t->id_transaksi ?? $t->id, 5, '0', STR_PAD_LEFT) }}</td>
+                        
+                        <!-- PERBAIKAN 1: Menggunakan tanggal_transaksi agar waktu realtime & sesuai struk -->
                         <td class="date-cell">
-                            {{ \Carbon\Carbon::parse($t->created_at)->translatedFormat('d F Y, H:i') }} WIB
+                            {{ \Carbon\Carbon::parse($t->tanggal_transaksi)->translatedFormat('d F Y, H:i') }} WIB
                         </td>
+                        
                         <td style="text-align: center;">
                             <span class="discount-badge">{{ $t->diskon ?? 0 }}%</span>
                         </td>
@@ -135,7 +138,8 @@
                             </span>
                         </td>
                         <td style="text-align: center;">
-                            <a href="{{ url('/transaksi/cetak/'.$t->id_transaksi) }}" class="btn-print" target="_blank">
+                            <!-- PERBAIKAN 2: Mengubah /transaksi/cetak menjadi /transaksi/nota agar rutenya cocok -->
+                            <a href="{{ url('/transaksi/nota/'.$t->id_transaksi) }}" class="btn-print" target="_blank">
                                 <i class="fa-solid fa-print"></i> Cetak Ulang
                             </a>
                         </td>

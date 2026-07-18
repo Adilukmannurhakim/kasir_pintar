@@ -9,6 +9,8 @@ class DetailTransaksi extends Model
 {
     protected $table = 'detail_transaksi';
     protected $primaryKey = 'id_detail';
+
+    public $timestamps = true;
     
     protected $fillable = [
         'id_transaksi',

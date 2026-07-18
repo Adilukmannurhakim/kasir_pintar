@@ -15,17 +15,21 @@ class DashboardController extends Controller
         $hariIni = Carbon::today();
 
         // 1. Statistik Hari Ini
-        $omzetHariIni = Transaksi::whereDate('tanggal_transaksi', $hariIni)->sum('grand_total');
+        $omzetHariIni = Transaksi::whereDate('tanggal_transaksi', $hariIni)->sum('grand_total') ?? 0;
         $transaksiHariIni = Transaksi::whereDate('tanggal_transaksi', $hariIni)->count();
         $produkTerjualHariIni = DetailTransaksi::whereHas('transaksi', function($query) use ($hariIni) {
             $query->whereDate('tanggal_transaksi', $hariIni);
-        })->sum('jumlah');
+        })->sum('jumlah') ?? 0;
 
         // 2. Data Grafik Penjualan (7 Hari Terakhir)
-        $grafikData = [];
+        $grafikData = [
+            'labels' => [],
+            'data' => []
+        ];
+        
         for ($i = 6; $i >= 0; $i--) {
             $tanggal = Carbon::today()->subDays($i);
-            $totalPendapatan = Transaksi::whereDate('tanggal_transaksi', $tanggal)->sum('grand_total');
+            $totalPendapatan = Transaksi::whereDate('tanggal_transaksi', $tanggal)->sum('grand_total') ?? 0;
             
             $grafikData['labels'][] = $tanggal->translatedFormat('d M'); // Contoh: "17 Jul"
             $grafikData['data'][] = $totalPendapatan;
@@ -33,8 +37,8 @@ class DashboardController extends Controller
 
         // 3. 5 Transaksi Terbaru hari ini
         $transaksiTerbaru = Transaksi::orderBy('tanggal_transaksi', 'desc')
-                                      ->limit(5)
-                                      ->get();
+                                     ->limit(5)
+                                     ->get();
 
         return view('dashboard', compact(
             'omzetHariIni', 
