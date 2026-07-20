@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Transaksi - Maju Jaya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -62,95 +63,149 @@
 </head>
 <body>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-store"></i> MAJU JAYA
-        </div>
-        <a href="{{ route('dashboard') }}" class="nav-link">
-            <i class="fa-solid fa-chart-pie"></i> Dashboard
-        </a>
-        <a href="{{ route('transaksi.index') }}" class="nav-link">
-            <i class="fa-solid fa-cash-register"></i> Kasir / Transaksi
-        </a>
-        <a href="{{ route('transaksi.riwayat') }}" class="nav-link active">
-            <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
-        </a>
-        <a href="{{ route('produk.index') }}" class="nav-link">
-            <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
-        </a>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-container">
+<div class="w-full min-h-screen bg-slate-50 font-sans antialiased">
     
-    <!-- HEADER UTAMA -->
-    <div class="header-container">
-        <div>
-            <h1 class="main-title">Riwayat Transaksi</h1>
-            <p class="sub-title">Pantau seluruh catatan transaksi penjualan kasir Anda</p>
+    <!-- ========================================== -->
+    <!-- SIDEBAR UTAMA                              -->
+    <!-- ========================================== -->
+    <div class="w-64 bg-[#3b32a7] text-white fixed top-0 bottom-0 left-0 p-6 flex flex-col justify-between shadow-xl z-50">
+        <div class="flex flex-col gap-8">
+            <!-- Logo Toko -->
+            <div class="flex items-center gap-3 px-2 py-2">
+                <i class="fa-solid fa-shop text-xl text-white"></i>
+                <span class="text-lg font-bold tracking-wider uppercase text-white">MAJU JAYA</span>
+            </div>
+            
+            <!-- Menu Navigasi -->
+            <nav class="flex flex-col gap-2">
+                <a href="{{ route('dashboard') }}" 
+                   class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+                   {{ request()->routeIs('dashboard') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                    <i class="fa-solid fa-chart-pie text-lg w-5 text-center"></i> Dashboard
+                </a>
+                
+                <a href="{{ route('transaksi.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+                   {{ request()->routeIs('transaksi.index') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                    <i class="fa-solid fa-cash-register text-lg w-5 text-center"></i> Kasir / Transaksi
+                </a>
+                
+                <a href="{{ route('transaksi.riwayat') }}" 
+                   class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+                   {{ request()->routeIs('transaksi.riwayat') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                    <i class="fa-solid fa-history text-lg w-5 text-center"></i> Riwayat Transaksi
+                </a>
+
+                @if(auth()->check() && auth()->user()->role == 'admin')
+                <a href="{{ route('produk.index') }}" 
+                   class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+                   {{ request()->routeIs('produk.*') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                    <i class="fa-solid fa-boxes-stacked text-lg w-5 text-center"></i> Kelola Produk
+                </a>
+                @endif
+            </nav>
         </div>
-        
-        <div class="button-group">
-            <a href="{{ url('/') }}" class="btn-back-dashboard">
-                <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
-            </a>
-        </div>
+
+        <!-- Tombol Keluar -->
+        <form action="{{ route('logout') }}" method="POST" id="logout-form" class="hidden">
+            @csrf
+        </form>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+           class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-red-600 hover:text-white rounded-xl transition duration-150">
+            <i class="fa-solid fa-right-from-bracket text-lg w-5 text-center"></i> Keluar Aplikasi
+        </a>
     </div>
 
-    <!-- CARD TABEL RIWAYAT -->
-    <div class="table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th style="width: 120px;">No. Nota</th>
-                    <th>Tanggal & Waktu</th>
-                    <th style="text-align: center;">Diskon (%)</th>
-                    <th style="text-align: right;">Potongan</th>
-                    <th style="text-align: right;">Total Bayar</th>
-                    <th style="text-align: center; width: 120px;">Status</th>
-                    <th style="text-align: center; width: 140px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Silakan sesuaikan nama variabel $transaksis / $riwayats sesuai controller Anda -->
-                @foreach($transaksis as $t)
-                    <tr>
-                        <td class="nota-cell">#{{ str_pad($t->id_transaksi ?? $t->id, 5, '0', STR_PAD_LEFT) }}</td>
-                        
-                        <!-- PERBAIKAN 1: Menggunakan tanggal_transaksi agar waktu realtime & sesuai struk -->
-                        <td class="date-cell">
-                            {{ \Carbon\Carbon::parse($t->tanggal_transaksi)->translatedFormat('d F Y, H:i') }} WIB
-                        </td>
-                        
-                        <td style="text-align: center;">
-                            <span class="discount-badge">{{ $t->diskon ?? 0 }}%</span>
-                        </td>
-                        <td style="text-align: right; font-weight: 500; color: #ef4444;">
-                            Rp {{ number_format($t->nominal_diskon ?? 0, 0, ',', '.') }}
-                        </td>
-                        <td style="text-align: right; font-weight: 700; color: #1e293b;" class="total-cell">
-                            Rp {{ number_format($t->total_harga ?? $t->total ?? $t->grand_total, 0, ',', '.') }}
-                        </td>
-                        <td style="text-align: center;">
-                            <span class="status-badge {{ strtolower($t->status ?? 'selesai') == 'selesai' ? 'status-success' : 'status-pending' }}">
-                                {{ $t->status ?? 'Selesai' }}
-                            </span>
-                        </td>
-                        <td style="text-align: center;">
-                            <!-- PERBAIKAN 2: Mengubah /transaksi/cetak menjadi /transaksi/nota agar rutenya cocok -->
-                            <a href="{{ url('/transaksi/nota/'.$t->id_transaksi) }}" class="btn-print" target="_blank">
-                                <i class="fa-solid fa-print"></i> Cetak Ulang
-                            </a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <!-- ========================================== -->
+    <!-- KONTEN UTAMA (DILONGGARKAN AGAR MAKSIMAL)  -->
+    <!-- ========================================== -->
+    <div class="ml-64 p-8">
+        
+        <!-- Header Halaman -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">Riwayat Transaksi</h1>
+            <p class="text-sm text-slate-500">Daftar rekaman seluruh transaksi penjualan kasir</p>
+        </div>
 
-        <!-- PAGINATION SECTION (MEMBATASI UKURAN PANAH RAKSASA) -->
-        <div class="pagination-wrapper">
-            {{ $transaksis->links() }}
+        <!-- CARD UTAMA: Dibuat w-full tanpa batas maksimal -->
+        <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="w-full overflow-x-auto">
+                <table class="w-full text-left border-collapse table-fixed">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            <th class="px-6 py-4 w-28">No. Nota</th>
+                            <th class="px-6 py-4 w-56">Tanggal & Waktu</th>
+                            <th class="px-6 py-4 text-center w-24">Diskon</th>
+                            <th class="px-6 py-4 text-right w-36">Potongan</th>
+                            <th class="px-6 py-4 text-right w-40">Total Bayar</th>
+                            <th class="px-6 py-4 text-center w-28">Status</th>
+                            <th class="px-6 py-4 text-center w-36">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+                        @foreach($transaksis as $t)
+                            <tr class="hover:bg-slate-50/70 transition duration-150">
+                                <!-- No Nota -->
+                                <td class="px-6 py-4 font-mono font-bold text-slate-600">
+                                    #{{ str_pad($t->id_transaksi ?? $t->id, 5, '0', STR_PAD_LEFT) }}
+                                </td>
+                                
+                                <!-- Tanggal Waktu -->
+                                <td class="px-6 py-4 text-slate-600 truncate">
+                                    {{ \Carbon\Carbon::parse($t->tanggal_transaksi)->translatedFormat('d F Y, H:i') }} WIB
+                                </td>
+                                
+                                <!-- Diskon (%) -->
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                        {{ $t->diskon ?? 0 }}%
+                                    </span>
+                                </td>
+                                
+                                <!-- Potongan Nominal -->
+                                <td class="px-6 py-4 text-right font-medium text-red-500 whitespace-nowrap">
+                                    Rp {{ number_format($t->nominal_diskon ?? 0, 0, ',', '.') }}
+                                </td>
+                                
+                                <!-- Total Bayar -->
+                                <td class="px-6 py-4 text-right font-bold text-slate-800 whitespace-nowrap">
+                                    Rp {{ number_format($t->total_harga ?? $t->total ?? $t->grand_total, 0, ',', '.') }}
+                                </td>
+                                
+                                <!-- Status -->
+                                <td class="px-6 py-4 text-center">
+                                    @if(strtolower($t->status ?? 'selesai') == 'selesai')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            Selesai
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            {{ $t->status }}
+                                        </span>
+                                    @endif
+                                </td>
+                                
+                                <!-- Tombol Aksi -->
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{{ route('transaksi.nota', $t->id_transaksi ?? $t->id) }}" 
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition duration-150 whitespace-nowrap" 
+                                       target="_blank">
+                                        <i class="fa-solid fa-print"></i> Cetak Ulang
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINATION -->
+            @if($transaksis->hasPages())
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100">
+                {{ $transaksis->links('pagination::tailwind') }}
+            </div>
+            @endif
+
         </div>
     </div>
 </div>

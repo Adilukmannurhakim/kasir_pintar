@@ -57,7 +57,7 @@
 
 <div class="login-card">
     <div class="brand">
-        <h2>MAJU JAYA</h2>
+        <h2>JAYA</h2>
         <p>Silakan masuk ke akun kasir Anda</p>
     </div>
 

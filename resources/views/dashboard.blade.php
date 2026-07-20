@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Kasir</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Link FontAwesome untuk icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -62,148 +64,156 @@
 <body>
 
     <!-- SIDEBAR -->
-<div class="sidebar" style="display: flex; flex-direction: column; height: 100vh; justify-content: space-between; box-sizing: border-box; padding-bottom: 20px;">
-    
-    <!-- Bagian Atas: Logo dan Menu Navigasi -->
-    <div class="sidebar-top">
-        <div class="logo" style="margin-bottom: 24px;">
-            <i class="fa-solid fa-store"></i> JAYA
+<!-- PASTIKAN DIV CONTAINER UTAMA SIDEBAR MENGGUNAKAN LEBAR w-64 DAN PADDING p-6 -->
+<div class="w-64 bg-[#3b32a7] text-white fixed top-0 bottom-0 left-0 p-6 flex flex-col justify-between shadow-xl z-50">
+    <div class="flex flex-col gap-8">
+        <!-- Logo Toko -->
+        <div class="flex items-center gap-3 px-2 py-2">
+            <i class="fa-solid fa-shop text-xl text-white"></i>
+            <span class="text-lg font-bold tracking-wider uppercase text-white">MAJU JAYA</span>
         </div>
         
-        <div class="nav-menu" style="display: flex; flex-direction: column; gap: 8px;">
-            <a href="{{ route('dashboard') }}" class="nav-link active">
-                <i class="fa-solid fa-chart-pie"></i> Dashboard
+        <!-- Menu Navigasi -->
+        <nav class="flex flex-col gap-2">
+            
+            <!-- Menu Dashboard -->
+            <a href="{{ route('dashboard') }}" 
+            class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+            {{ request()->routeIs('dashboard') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                <i class="fa-solid fa-chart-pie text-lg w-5 text-center"></i> Dashboard
             </a>
-            <a href="{{ route('transaksi.index') }}" class="nav-link">
-                <i class="fa-solid fa-cash-register"></i> Kasir / Transaksi
+            
+            <!-- Menu Kasir / Transaksi Utama -->
+            <a href="{{ route('transaksi.index') }}" 
+            class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+            {{ request()->routeIs('transaksi.index') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                <i class="fa-solid fa-cash-register text-lg w-5 text-center"></i> Kasir / Transaksi
             </a>
-            <a href="{{ route('transaksi.riwayat') }}" class="nav-link">
-                <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Transaksi
+            
+            <!-- Menu Riwayat Transaksi -->
+            <a href="{{ route('transaksi.riwayat') }}" 
+            class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+            {{ request()->routeIs('transaksi.riwayat') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                <i class="fa-solid fa-history text-lg w-5 text-center"></i> Riwayat Transaksi
             </a>
-            <a href="{{ route('produk.index') }}" class="nav-link">
-                <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
+
+            <!-- Menu Kelola Produk -->
+            <a href="{{ route('produk.index') }}" 
+            class="flex items-center gap-3 px-4 py-3 text-sm transition duration-150 
+            {{ request()->routeIs('produk.*') ? 'font-bold bg-white text-[#3b32a7] rounded-l-full -mr-6 shadow-sm' : 'font-semibold text-white/80 hover:bg-white/10 hover:text-white rounded-xl' }}">
+                <i class="fa-solid fa-boxes-stacked text-lg w-5 text-center"></i> Kelola Produk
             </a>
-        </div>
+            
+        </nav>
     </div>
 
-    <!-- Bagian Bawah: Tombol Logout (Tetap di dalam kelas .sidebar) -->
-    <div class="sidebar-footer" style="padding: 16px 0 0 0; border-top: 1px solid #e2e8f0; margin-top: auto;">
-        <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: block; width: 100%;">
-            @csrf
-            <button type="submit" class="btn-logout" style="
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                width: 100%;
-                padding: 12px 16px;
-                background: transparent;
-                border: none;
-                color: #ef4444;
-                font-size: 15px;
-                font-weight: 500;
-                border-radius: 8px;
-                cursor: pointer;
-                text-align: left;
-                transition: all 0.2s ease;
-                box-sizing: border-box;
-            " onmouseover="this.style.backgroundColor='#fef2f2'" onmouseout="this.style.backgroundColor='transparent'">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Logout
-            </button>
-        </form>
-    </div>
-
+    <!-- Tombol Keluar -->
+    <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-red-600 hover:text-white rounded-xl transition duration-150">
+        <i class="fa-solid fa-right-from-bracket text-lg w-5 text-center"></i> Keluar Aplikasi
+    </a>
 </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-        <div class="header">
+</div>
+    <!-- MAIN CONTENT (Ditambahkan ml-64 agar bergeser ke kanan mengikuti lebar sidebar Anda) -->
+    <div class="ml-64 p-8 min-h-screen bg-slate-50 text-slate-800 box-border w-[calc(100%-16rem)] max-w-none">
+    
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Ringkasan Penjualan</h1>
+            <p class="text-sm text-slate-500 mt-1">Pantau performa harian tokomu di sini.</p>
+        </div>
+        <div class="flex items-center gap-2 font-semibold text-sm text-slate-500 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+            <i class="fa-regular fa-calendar text-indigo-500"></i> {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}
+        </div>
+    </div>
+
+    <!-- 3 KARTU STATISTIK UTAMA -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Kartu Omzet -->
+        <div class="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 text-xl">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
             <div>
-                <h1>Ringkasan Penjualan</h1>
-                <p style="color: var(--text-muted); margin-top: 5px;">Pantau performa harian tokomu di sini.</p>
-            </div>
-            <div style="font-weight: 600; color: var(--text-muted);">
-                <i class="fa-regular fa-calendar"></i> {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}
+                <p class="text-sm font-medium text-slate-400">Omzet Hari Ini</p>
+                <h3 class="text-xl font-bold text-slate-800 mt-0.5">Rp {{ number_format($omzetHariIni, 0, ',', '.') }}</h3>
             </div>
         </div>
 
-        <!-- 3 KARTU STATISTIK UTAMA -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon icon-green">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <div class="stat-info">
-                    <p>Omzet Hari Ini</p>
-                    <h3>Rp {{ number_format($omzetHariIni, 0, ',', '.') }}</h3>
-                </div>
+        <!-- Kartu Transaksi -->
+        <div class="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600 text-xl">
+                <i class="fa-solid fa-receipt"></i>
             </div>
-
-            <div class="stat-card">
-                <div class="stat-icon icon-blue">
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-                <div class="stat-info">
-                    <p>Transaksi Hari Ini</p>
-                    <h3>{{ $transaksiHariIni }} Transaksi</h3>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon icon-yellow">
-                    <i class="fa-solid fa-box-open"></i>
-                </div>
-                <div class="stat-info">
-                    <p>Produk Terjual Hari Ini</p>
-                    <h3>{{ $produkTerjualHariIni }} Pcs</h3>
-                </div>
+            <div>
+                <p class="text-sm font-medium text-slate-400">Transaksi Hari Ini</p>
+                <h3 class="text-xl font-bold text-slate-800 mt-0.5">{{ $transaksiHariIni }} Transaksi</h3>
             </div>
         </div>
 
-        <!-- LAYOUT GRAFIK & TABEL -->
-        <div class="dashboard-grid">
-            <!-- KIRI: GRAFIK Chart.js -->
-            <div class="card">
-                <h2>Tren Penjualan 7 Hari Terakhir</h2>
-                <div style="position: relative; height:300px; width:100%;">
-                    <canvas id="salesChart"></canvas>
-                </div>
+        <!-- Kartu Produk Terjual -->
+        <div class="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-amber-50 text-amber-600 text-xl">
+                <i class="fa-solid fa-box-open"></i>
             </div>
-
-            <!-- KANAN: TABEL TRANSAKSI TERBARU -->
-            <div class="card">
-                <h2>Aktivitas Transaksi Terbaru</h2>
-                <table class="recent-table">
-                    <thead>
-                        <tr>
-                            <th>No. Nota</th>
-                            <th>Waktu</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($transaksiTerbaru as $trx)
-                            <tr>
-                                <td style="font-weight: 600;">#{{ str_pad($trx->id_transaksi, 5, '0', STR_PAD_LEFT) }}</td>
-                                <td style="color: var(--text-muted);">{{ \Carbon\Carbon::parse($trx->tanggal_transaksi)->format('H:i') }} WIB</td>
-                                <td style="font-weight: 700; color: var(--primary);">Rp {{ number_format($trx->grand_total, 0, ',', '.') }}</td>
-                                <td><span class="badge">Selesai</span></td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">Belum ada transaksi hari ini.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div>
+                <p class="text-sm font-medium text-slate-400">Produk Terjual Hari Ini</p>
+                <h3 class="text-xl font-bold text-slate-800 mt-0.5">{{ $produkTerjualHariIni }} Pcs</h3>
             </div>
         </div>
     </div>
+
+    <!-- LAYOUT GRAFIK & TABEL -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- KIRI: GRAFIK Chart.js (Mengambil 7 Kolom) -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-base font-bold text-slate-800 mb-4">Tren Penjualan 7 Hari Terakhir</h2>
+            <div class="relative h-[300px] w-full">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- KANAN: TABEL TRANSAKSI TERBARU (Mengambil 5 Kolom) -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+            <div>
+                <h2 class="text-base font-bold text-slate-800 mb-4">Aktivitas Transaksi Terbaru</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                <th class="pb-3">No. Nota</th>
+                                <th class="pb-3">Waktu</th>
+                                <th class="pb-3 text-right">Total</th>
+                                <th class="pb-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 text-sm">
+                            @forelse($transaksiTerbaru as $trx)
+                                <tr class="hover:bg-slate-50/50 transition duration-150">
+                                    <td class="py-3 font-semibold text-slate-700">#{{ str_pad($trx->id_transaksi, 5, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="py-3 text-slate-400">{{ \Carbon\Carbon::parse($trx->tanggal_transaksi)->format('H:i') }} WIB</td>
+                                    <td class="py-3 font-bold text-indigo-600 text-right">Rp {{ number_format($trx->grand_total, 0, ',', '.') }}</td>
+                                    <td class="py-3 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                            Selesai
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-10 text-center text-sm font-medium text-slate-400">
+                                        Belum ada transaksi hari ini.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- CONFIGURATION Chart.js -->
     <script>

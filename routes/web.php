@@ -68,20 +68,17 @@ Route::get('/', function () {
 // 2. Rute Aplikasi Utama yang wajib Login
 Route::middleware(['auth'])->group(function () {
     
-    // Halaman Dashboard dengan penamaan route('dashboard') yang valid
+    // Bisa diakses oleh ADMIN maupun KASIR
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // ... rute transaksi dan produk Anda tetap di bawah sini ...
-
-    // Rute Transaksi / Kasir
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
-    Route::get('/transaksi/nota/{id}', [TransaksiController::class, 'nota']);
     Route::get('/transaksi/riwayat', [TransaksiController::class, 'riwayat'])->name('transaksi.riwayat');
 
-    // Rute Kelola Produk
-    Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
-    Route::get('/produk/create', [ProdukController::class, 'create'])->name('produk.create');
-    Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
-    Route::delete('/produk/{id}', [ProdukController::class, 'hapus'])->name('produk.hapus');
+    // KHUSUS ADMIN SAJA (Kasir tidak bisa buka)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
+        Route::get('/produk/create', [ProdukController::class, 'create'])->name('produk.create');
+        Route::post('/produk', [ProdukController::class, 'store'])->name('produk.store');
+        Route::delete('/produk/{id}', [ProdukController::class, 'hapus'])->name('produk.hapus');
+    });
 });

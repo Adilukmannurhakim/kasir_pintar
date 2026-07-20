@@ -13,6 +13,7 @@ class TransaksiController extends Controller
     // Menampilkan halaman transaksi kasir
     public function index()
     {
+        // Mengambil produk yang stoknya > 0 (SoftDeletes otomatis menyaring produk yang belum dihapus)
         $produks = Produk::where('stok', '>', 0)->get();
         return view('transaksi.index', compact('produks'));
     }
@@ -26,65 +27,80 @@ class TransaksiController extends Controller
             'grand_total' => 'required|numeric',
         ]);
 
-        // Menggunakan DB transaction dan menangkap ID transaksi baru
-        $id_transaksi = DB::transaction(function () use ($request) {
-            $transaksi = Transaksi::create([
-                'tanggal_transaksi' => now(),
-                'total_bayar' => $request->total_bayar,
-                'diskon' => $request->diskon ?? 0,
-                'pajak' => $request->pajak ?? 0,
-                'grand_total' => $request->grand_total,
-            ]);
-
-            // 2. Simpan ke tabel Detail Transaksi & Kurangi Stok Produk
-            foreach ($request->cart as $item) {
-                DetailTransaksi::create([
-                    'id_transaksi' => $transaksi->id_transaksi,
-                    'id_produk' => $item['id_produk'],
-                    'jumlah' => $item['jumlah'],
-                    'subtotal' => $item['subtotal'],
+        try {
+            $id_transaksi = DB::transaction(function () use ($request) {
+                // 1. Simpan ke tabel Transaksi
+                $transaksi = Transaksi::create([
+                    'tanggal_transaksi' => now(),
+                    'total_bayar'       => $request->total_bayar, 
+                    'diskon'            => $request->diskon ?? 0,
+                    'pajak'             => $request->pajak ?? 0,
+                    'grand_total'       => $request->grand_total, 
+                    'id_pelanggan'      => null,
                 ]);
 
-                // Kurangi stok produk di database
-                $produk = Produk::find($item['id_produk']);
-                if ($produk) {
-                    $produk->decrement('stok', $item['jumlah']);
-                }
-            }
-            
-            return $transaksi->id_transaksi; // Kembalikan ID untuk dikirim ke frontend
-        });
+                // Ambil ID Transaksi yang baru disave
+                $transaksiId = $transaksi->id_transaksi;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Transaksi berhasil disimpan!', // <-- Sekarang sudah ditambahkan koma di sini
-            'id_transaksi' => $id_transaksi // Kirimkan ID transaksi baru ke JS
-        ]);
+                // 2. Loop item untuk menyimpan detail dan memotong stok
+                foreach ($request->cart as $item) {
+                    $subtotalItem = $item['price'] * $item['qty'];
+
+                    // Simpan Detail Transaksi
+                    DetailTransaksi::create([
+                        'id_transaksi' => $transaksiId,
+                        'id_produk'    => $item['id'], // ID dari JS dipetakan ke kolom id_produk
+                        'jumlah'       => $item['qty'],  
+                        'subtotal'     => $subtotalItem,
+                    ]);
+
+                    // Mengurangi stok produk (Menggunakan id_produk sebagai acuan sesuai model Produk)
+                    $produk = Produk::find($item['id']);
+                    
+                    if ($produk) {
+                        $produk->decrement('stok', $item['qty']);
+                    }
+                }
+                
+                return $transaksiId;
+            }); // Penutup DB::transaction yang benar
+
+            return response()->json([
+                'success'      => true, 
+                'message'      => 'Transaksi berhasil disimpan!',
+                'id_transaksi' => $id_transaksi
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                // UBAH BARIS INI untuk memunculkan pesan error asli dari database:
+                'message' => 'Error Sistem: ' . $e->getMessage() 
+            ], 500);
+        }
     }
 
-    // 2. Tambahkan fungsi baru untuk mengambil data nota
+    // Mengambil data nota untuk dicetak
     public function nota($id)
     {
-        // Mengambil transaksi dengan detail produknya
         $transaksi = Transaksi::findOrFail($id);
+        // with('produk') akan berjalan mulus karena relasi di DetailTransaksi sudah disesuaikan
         $details = DetailTransaksi::with('produk')->where('id_transaksi', $id)->get();
 
         return view('transaksi.nota', compact('transaksi', 'details'));
     }
+
     // Menampilkan halaman riwayat semua transaksi
     public function riwayat(Request $request)
     {
-        // Ambil query pencarian tanggal jika ada filter dari user
         $tanggal = $request->input('tanggal');
-
         $query = Transaksi::orderBy('tanggal_transaksi', 'desc');
 
-        // Jika user melakukan filter berdasarkan tanggal tertentu
         if ($tanggal) {
             $query->whereDate('tanggal_transaksi', $tanggal);
         }
 
-        $transaksis = $query->paginate(10); // Menampilkan 10 data per halaman (pagination)
+        $transaksis = $query->paginate(10);
 
         return view('transaksi.riwayat', compact('transaksis', 'tanggal'));
     }
