@@ -108,9 +108,10 @@
     </div>
 
     <!-- Tombol Keluar -->
-    <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-red-600 hover:text-white rounded-xl transition duration-150">
-        <i class="fa-solid fa-right-from-bracket text-lg w-5 text-center"></i> Keluar Aplikasi
-    </a>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" 
+            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white/80 hover:bg-red-600 hover:text-white rounded-xl transition duration-150">
+                <i class="fa-solid fa-right-from-bracket text-lg w-5 text-center"></i> Keluar Aplikasi
+        </a>
 </div>
 
 </div>
