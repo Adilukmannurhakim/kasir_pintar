@@ -21,8 +21,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        //
+        if (config('app.env') === 'production' || isset($_ENV['VERCEL'])) {
+        URL::forceScheme('https');
     }
+}
 }
