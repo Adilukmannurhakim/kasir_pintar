@@ -19,10 +19,16 @@ class AuthController extends Controller
     // Memproses aksi login
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
+
+        // Mappings input 'username' ke kolom 'email' di database
+        $credentials = [
+            'email'    => $request->username,
+            'password' => $request->password,
+        ];
 
         // Proses autentikasi menggunakan Auth Laravel
         if (Auth::attempt($credentials)) {
